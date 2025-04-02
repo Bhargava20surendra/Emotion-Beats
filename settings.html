@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .light-mode {
+            background-color: white;
+            color: black;
+        }
+        .light-mode .bg-gray-900 {
+            background-color: #f3f4f6;
+        }
+        .light-mode .text-pink-500 {
+            color: #d946ef;
+        }
+        .light-mode .bg-gray-700 {
+            background-color: #d1d5db;
+        }
+    </style>
+</head>
+<body class="bg-black text-white flex flex-col min-h-screen items-center justify-center" id="body">
+
+    <!-- Top Bar -->
+    <div class="bg-gray-900 p-4 flex items-center justify-between w-full max-w-4xl rounded-lg shadow-lg">
+        <h1 class="text-2xl font-bold text-pink-500 bg-black px-4 py-2 rounded flex items-center">
+            <i class="fa-solid fa-headset mr-2"></i> Emotion Beats
+        </h1>
+        <a href="{{ url_for('notifications') }}" class="relative">
+            <button>
+                🔔
+                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+            </button>
+        </a>
+    </div>
+
+    <!-- Settings Panel -->
+    <div class="bg-gray-900 p-6 rounded-lg shadow-xl w-full max-w-4xl mt-6">
+        <h2 class="text-2xl font-bold text-center text-pink-500 mb-6">Settings</h2>
+        
+        <!-- Volume Control -->
+        <div class="flex items-center justify-between mb-6">
+            <span class="text-lg">Volume</span>
+            <input type="range" min="0" max="100" value="50" class="w-2/3 h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" id="volumeSlider">
+            <span class="text-lg"><i class="fa-solid fa-volume-up"></i></span>
+        </div>
+
+        <!-- Toggle Buttons -->
+        <div class="space-y-4">
+            <div class="flex items-center justify-between">
+                <span class="text-lg">Dark Mode</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" value="" class="sr-only peer" id="darkModeToggle">
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:ring-4 peer-focus:ring-pink-500 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                </label>
+            </div>
+            <div class="flex items-center justify-between">
+                <span class="text-lg">Notifications</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" value="" class="sr-only peer">
+                    <div class="w-11 h-6 bg-gray-700 peer-focus:ring-4 peer-focus:ring-pink-500 rounded-full peer peer-checked:after:translate-x-5 peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
+                </label>
+            </div>
+        </div>
+
+        <!-- Extra Buttons -->
+        <div class="flex justify-between mt-6">
+            <button class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded flex items-center">
+                <a href="{{ url_for('profile') }}"><i class="fa-solid fa-user mr-2"></i> Edit Profile</a>
+            </button>
+            <button class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded flex items-center">
+                <a href="{{ url_for('change_password') }}"><i class="fa-solid fa-key mr-2"></i> Change Password</a>
+            </button>
+            <button class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded flex items-center">
+                <a href="{{ url_for('logout') }}"><i class="fa-solid fa-sign-out-alt mr-2"></i> Logout</a>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Apply saved theme on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const isLightMode = localStorage.getItem('light-mode') === 'true';
+            if (isLightMode) {
+                document.body.classList.add('light-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+        });
+
+        // Toggle Dark Mode and save preference
+        document.getElementById('darkModeToggle').addEventListener('change', function() {
+            const isLightMode = document.body.classList.toggle('light-mode');
+            localStorage.setItem('light-mode', isLightMode);
+        });
+
+        // Adjust volume of audio elements (system volume control is not possible)
+        document.getElementById('volumeSlider').addEventListener('input', function() {
+            const volume = this.value / 100;
+            const audioElements = document.querySelectorAll('audio');
+
+            audioElements.forEach(audio => {
+                audio.volume = volume;
+            });
+
+            console.log('Adjusted volume to:', this.value);
+        });
+
+        // Apply dark mode on all pages
+        function applyTheme() {
+            if (localStorage.getItem('light-mode') === 'true') {
+                document.body.classList.add('light-mode');
+            }
+        }
+
+        applyTheme();
+    </script>
+
+</body>
+</html>

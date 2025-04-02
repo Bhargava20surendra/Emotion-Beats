@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Emotion Beats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+</head>
+<body class="bg-black flex justify-center items-center h-screen text-white">
+    <div class="w-full max-w-md p-8 space-y-6 bg-gray-900 rounded-lg shadow-lg">
+       <center> <h1 class="text-2xl font-bold text-pink-500 bg-black px-4 py-2 rounded"><i class="fa-solid fa-headset"></i> Emotion Beats</h1>
+        <h3 class="text-xl font-semibold">Welcome</h3>
+        <p class="text-gray-400">Login to your account to access the dashboard.</p></center>
+        <form method="POST" action="/login" class="space-y-4">
+            <div>
+                <label class="block mb-2">Username</label>
+                <input type="text" name="name" class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+            </div>
+            <div>
+                <label class="block mb-2">Password</label>
+                <input type="password" name="password" class="w-full p-3 rounded bg-gray-800 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-pink-500" required>
+            </div>
+            {% if error %}
+                <p class="text-red-500 text-sm">{{ error }}</p>
+            {% endif %}
+            <button type="submit" class="w-full p-3 bg-pink-500 rounded hover:bg-pink-600">Login</button>
+        </form>
+        <p class="text-center text-gray-400">Don't have an account? <a href="/register" class="text-pink-500 hover:underline">Register</a></p>
+    </div>
+</body>
+</html>

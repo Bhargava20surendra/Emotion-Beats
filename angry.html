@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Beats - Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white">
+
+   <!-- Wrapper to ensure full height -->
+<div class="flex flex-col min-h-screen overflow-y-auto">
+
+    <!-- Top Bar -->
+    <div class="bg-gray-900 p-4 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-pink-500 bg-black px-4 py-2 rounded"><i class="fa-solid fa-headset"></i> Emotion Beats</h1>
+        <div class="flex items-center space-x-4 relative">
+            <div class="flex items-center space-x-2 p-4">
+                <input type="text" id="searchInput" placeholder="Search With Voice..." 
+                    class="px-4 py-2 rounded-lg text-black bg-white">
+                <button id="voiceSearchBtn" class="bg-pink-500 p-2 rounded-full text-white">
+                    <i class="fa-solid fa-microphone"></i> 
+                </button>
+            </div>
+            <!-- Notification Icon -->
+            <a href="{{ url_for('notifications') }}" class="relative">
+                <button>
+                    🔔
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                </button>
+            </a>
+            <!-- User Avatar -->
+            <div class="relative">
+                <button onclick="toggleDropdown()" class="w-10 h-10 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-user-circle text-xl"></i> <!-- Profile Icon -->
+                </button>
+                <script>
+                    function toggleDropdown() {
+                        document.getElementById("userDropdown").classList.toggle("hidden");
+                    }
+                </script>
+                <!-- Dropdown Menu -->
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-2">
+                    <a href="{{ url_for('profile') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Edit Profile</a>
+                    <a href="{{ url_for('change_password') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Change Password</a>
+                    <a href="{{ url_for('settings') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Settings</a>
+                    <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <center>
+        <h1 style="font-size: 40px; color: rgb(119, 194, 238); font-weight: bold;">Angry Emotion Detected</h1>
+        <h5 style="font-size: 20px; color: rgb(211, 215, 218); font-weight: normal;">&#127925;Anger is a fire that burns brightly, but it's up to us to decide whether it warms or destroys.&#127925;
+        </h5>
+    </center>
+    <div class="p-6">
+        <div id="artistsContainer" class="grid grid-rows-3 gap-6"></div>
+    </div>
+</div>
+
+<!-- Audio Player -->
+<div id="audioPlayerContainer" 
+    class="fixed bottom-0 left-1/2 transform -translate-x-1/2 
+    bg-gray-900 bg-opacity-80 backdrop-blur-md p-4 flex items-center 
+    rounded-2xl shadow-2xl w-3/5">
+
+    <!-- Album Art -->
+    <img id="playerImage" src="static/images/default.jpg" 
+        class="w-14 h-14 rounded-lg mr-4">
+
+    <!-- Song Info and Controls -->
+    <div class="flex flex-col w-full">
+        <h3 id="playerTitle" class="text-lg font-semibold text-white">
+            Select a song
+        </h3>
+
+        <!-- Controls -->
+        <div class="flex items-center space-x-4">
+            <button id="prevBtn" class="text-white text-xl hover:text-pink-500 transition">
+                <i class="fa-solid fa-backward-step"></i>
+            </button>
+            
+            <button id="playPauseBtn" class="text-white text-2xl hover:text-pink-500 transition">
+                <i class="fa-solid fa-play"></i>
+            </button>
+            
+            <button id="nextBtn" class="text-white text-xl hover:text-pink-500 transition">
+                <i class="fa-solid fa-forward-step"></i>
+            </button>
+        </div>
+
+        <!-- Timer -->
+        <div class="flex justify-between text-xs text-white font-medium mt-1">
+            <span id="currentTime">00:00</span>
+            <span id="totalDuration">00:00</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="relative w-full mt-2">
+            <audio id="audioPlayer" class="w-full"></audio>
+            <div class="absolute top-1/2 left-0 w-full bg-gray-700 rounded-full h-1.5 transform -translate-y-1/2">
+                <div id="progressBar" class="bg-pink-500 h-1.5 rounded-full w-0"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    const audioPlayer = document.getElementById("audioPlayer");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const currentTimeDisplay = document.getElementById("currentTime");
+    const totalDurationDisplay = document.getElementById("totalDuration");
+    const progressBar = document.getElementById("progressBar");
+
+    // Play & Pause Toggle
+    let currentAudio = null;
+    let currentIndex = -1;
+    let songs = [];
+
+    function toggleMusic(musicUrl, imageUrl, artistName, index) {
+        let playerImage = document.getElementById("playerImage");
+        let playerTitle = document.getElementById("playerTitle");
+    
+        // If the same song is clicked, toggle play/pause
+        if (currentAudio === musicUrl) {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        } else {
+            // Load a new song and play it
+            audioPlayer.src = musicUrl;
+            playerImage.src = imageUrl;
+            playerTitle.innerText = artistName;
+            audioPlayer.load();  // Ensure the browser loads the new file
+            audioPlayer.play();   // Play the song
+            currentAudio = musicUrl; // Update current song
+            currentIndex = index; // Update current index
+        }
+    }
+    
+    // When clicking the Play/Pause button
+    playPauseBtn.addEventListener("click", function () {
+        if (audioPlayer.src) {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+    });
+    
+    // Sync Play/Pause Button with Audio Events
+    audioPlayer.addEventListener("play", function () {
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i>';
+    });
+    
+    audioPlayer.addEventListener("pause", function () {
+        playPauseBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
+    });
+    
+    // Update Timer and Progress Bar
+    audioPlayer.addEventListener("timeupdate", function () {
+        if (audioPlayer.duration) {
+            // Update current time
+            let currentMinutes = Math.floor(audioPlayer.currentTime / 60);
+            let currentSeconds = Math.floor(audioPlayer.currentTime % 60);
+            currentTimeDisplay.textContent = `${currentMinutes}:${currentSeconds < 10 ? "0" : ""}${currentSeconds}`;
+
+            // Update progress bar
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = progress + "%";
+        }
+    });
+
+    // Set Total Duration Once Metadata is Loaded
+    audioPlayer.addEventListener("loadedmetadata", function () {
+        let totalMinutes = Math.floor(audioPlayer.duration / 60);
+        let totalSeconds = Math.floor(audioPlayer.duration % 60);
+        totalDurationDisplay.textContent = `${totalMinutes}:${totalSeconds < 10 ? "0" : ""}${totalSeconds}`;
+    });
+
+    // Seek on Click
+    document.querySelector(".relative.w-full").addEventListener("click", function (event) {
+        const rect = this.getBoundingClientRect();
+        const clickX = event.clientX - rect.left;
+        const newTime = (clickX / rect.width) * audioPlayer.duration;
+        audioPlayer.currentTime = newTime;
+    });
+
+    // Next Button Functionality
+    nextBtn.addEventListener("click", function () {
+        if (currentIndex >= 0 && currentIndex < songs.length - 1) {
+            const nextSong = songs[currentIndex + 1];
+            toggleMusic(nextSong.music_url, nextSong.image_url, nextSong.name, currentIndex + 1);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetch('/artists5')
+        .then(response => response.json())
+        .then(data => {
+            let container = document.getElementById('artistsContainer');
+            container.innerHTML = ""; // Clear previous content
+    
+            let rowData = [
+                data.slice(0, 3),  // First row: IDs 1, 2, 3
+                data.slice(3, 6),  // Second row: IDs 4, 5, 6
+                data.slice(6, 9)   // Third row: IDs 7, 8, 9
+            ];
+    
+            rowData.forEach((rowSet, rowIndex) => {
+                let row = document.createElement("div");
+                row.className = "grid grid-cols-3 gap-4 artists-row";
+    
+                rowSet.forEach((song, songIndex) => {
+                    let artistCard = document.createElement("div");
+                    artistCard.className = "p-4 rounded-lg bg-gray-800 text-center artist-card";
+                    artistCard.setAttribute("data-name", song.name.toLowerCase().replace(/\./g, "").replace(/\s+/g, "")); // Normalize name
+    
+                    let img = document.createElement("img");
+                    img.src = song.image_url;
+                    img.className = "w-full h-40 object-cover rounded-md cursor-pointer";
+                    img.onclick = () => toggleMusic(song.music_url, song.image_url, song.name, rowIndex * 3 + songIndex);
+    
+                    let name = document.createElement("h3");
+                    name.className = "text-lg font-semibold mt-2";
+                    name.innerText = song.name;
+    
+                    artistCard.appendChild(img);
+                    artistCard.appendChild(name);
+                    row.appendChild(artistCard);
+                });
+    
+                container.appendChild(row);
+            });
+
+            // Store songs data for next button functionality
+            songs = data;
+        });
+    
+        // ✅ FIX: Voice Search Button Event
+        document.getElementById("voiceSearchBtn").addEventListener("click", function() {
+            if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                alert("Your browser doesn't support voice search. Try using Google Chrome!");
+                return;
+            }
+        
+            let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            let recognition = new SpeechRecognition();
+            recognition.lang = "en-US";
+            recognition.start();
+        
+            recognition.onresult = function(event) {
+                let voiceText = event.results[0][0].transcript;
+                console.log("🔊 Recognized Speech:", voiceText);  // Debugging log
+        
+                voiceText = voiceText.toLowerCase().trim().replace(/\./g, "").replace(/\s+/g, " ");
+                console.log("🔍 Normalized Text:", voiceText);  // Debugging log
+                
+                document.getElementById("searchInput").value = voiceText;
+                searchSongs(voiceText);
+            };
+        
+            recognition.onerror = function(event) {
+                console.error("❌ Speech recognition error:", event.error); // Shows error in console
+                alert(`Voice search failed: ${event.error}`);  // Show the real error message
+            };
+        
+            recognition.onend = function() {
+                console.log("🎤 Voice search ended");
+            };
+        });
+        
+        function searchSongs(query) {
+            query = query.toLowerCase().trim()
+                .replace(/\./g, "")  // Remove dots
+                .replace(/\s+/g, "") // Remove spaces
+                .replace(/-/g, "");  // ✅ NEW: Remove hyphens too
+        
+            let allCards = document.querySelectorAll(".artist-card");
+            let found = false;
+        
+            allCards.forEach(card => {
+                let songName = card.getAttribute("data-name")
+                    .replace(/\s+/g, "")  // Remove spaces in stored names
+                    .replace(/-/g, "");   // ✅ NEW: Remove hyphens from stored names
+        
+                console.log("Comparing:", query, "vs", songName); // Debugging log
+        
+                if (songName.includes(query)) {
+                    card.style.display = "block";
+                    found = true;
+        
+                    // Auto-play song if found
+                    let img = card.querySelector("img");
+                    img.click();
+                } else {
+                    card.style.display = "none";
+                }
+            });
+        
+            if (!found) {
+                alert(`Song "${query}" not found. Try again!`);
+        
+                // ✅ FIX: Show all cards again if not found
+                allCards.forEach(card => {
+                    card.style.display = "block";
+                });
+            }      
+        }
+    });
+</script>    
+    
+<style>
+    html, body {
+        height: 100%;
+        overflow-y: auto;
+    }
+    
+    #artistsContainer {
+        padding-bottom: 100px; /* Extra space so the last row is visible */
+    }
+    #audioPlayerContainer {
+        position: sticky;
+        bottom: 0;
+        z-index: 50;
+    }
+    .artist-card {
+        padding-top: 30px; /* Moves everything inside the div down */
+    }
+</style>
+
+</body>
+</html>

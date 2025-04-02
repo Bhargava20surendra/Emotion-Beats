@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music for {{ emotion }}</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-capitalize mb-4">Songs for {{ emotion }}</h1>
+        
+        {% if songs %}
+            <div class="list-group">
+                {% for song in songs %}
+                    <div class="list-group-item">
+                        <!-- Assuming the table has these common columns -->
+                        {% if song.title %}
+                            <h5 class="mb-1">{{ song.title }}</h5>
+                        {% endif %}
+                        {% if song.artist %}
+                            <p class="mb-1">Artist: {{ song.artist }}</p>
+                        {% endif %}
+                        {% if song.album %}
+                            <small>Album: {{ song.album }}</small>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No songs found for {{ emotion }}.
+            </div>
+        {% endif %}
+
+        <a href="{{ url_for('home') }}" class="btn btn-primary mt-3">Back to Home</a>
+    </div>
+
+    <!-- Bootstrap JS (optional, if you need Bootstrap JavaScript features) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

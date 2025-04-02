@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-black text-white flex flex-col min-h-screen">
+
+    <!-- Top Bar -->
+    <div class="bg-gray-900 p-4 flex items-center justify-between w-full">
+        <h1 class="text-2xl font-bold text-pink-500 bg-black px-4 py-2 rounded flex items-center">
+            <i class="fa-solid fa-headset mr-2"></i> Emotion Beats
+        </h1>
+        <div class="flex items-center space-x-4 relative">
+            <!-- Notification Icon -->
+           
+            <!-- User Avatar -->
+            <div class="relative">
+                <button onclick="toggleDropdown()" class="w-10 h-10 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                    <i class="fa-solid fa-user-circle text-xl"></i>
+                </button>
+                <script>
+                    function toggleDropdown() {
+                        document.getElementById("userDropdown").classList.toggle("hidden");
+                    }
+                </script>
+                <!-- Dropdown Menu -->
+                <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-2">
+                    <a href="{{ url_for('profile') }}"class="block px-4 py-2 text-white hover:bg-gray-700">Edit Profile</a>
+                    <a href="{{ url_for('change_password') }}"class="block px-4 py-2 text-white hover:bg-gray-700">Change Password</a>
+                    <a href="{{ url_for('settings') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Settings</a>
+                    <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Logout</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="flex justify-center items-center flex-grow">
+        <div class="w-full max-w-lg p-6 bg-gray-900/80 backdrop-blur-md rounded-xl shadow-xl border border-gray-800 text-center">
+            <h2  class="text-2xl font-bold text-pink-500 mb-6">Notifications</h2>
+            <h1 style:.line-tight {
+                line-height: 1.2; /* Adjust this value as needed */
+            }class="text-2xl font-normal text-white-500 mb-6">What's New</h1>
+            <h5 class="text-1xl font-normal text-white-500 mb-6">The latest releases from artists,podcasts,and shows you follow.</h5>
+            <div class="flex flex-col space-y-4 items-center">
+                <!-- Song Notification Cards -->
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="https://camo.githubusercontent.com/4e9e5aacbf5a6763bf73c029324159aeff389feac86aaa01acee495297bf8ece/68747470733a2f2f626c6f676765722e676f6f676c6575736572636f6e74656e742e636f6d2f696d672f622f523239765a32786c2f4156765873456a5f4e413749437533777a644d5f4a563647766c55324b5f565a5958645169393867774e486d513033546870674c6f774756614a535659524a6f33714732466e77394e756c646154635f544b7757754c6d6e7549593157726a366b7355426c5158344b577464334a503254747a464952794d50725955787965797547306c6576597959645f39396a6c45666e475f315969553671456e74313550725a4267365f4954656c6a657330565665564b5268357a78566b32354b6d4f69347a596d2f733332302f6a79756a79752e6a7067" alt="Song 0" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="https://open.spotify.com/track/1E4eyxteUpXpwThyARHrVJ?si=b4efec20391e43fe" class="text-blue-400 hover:underline">Chhaava</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="static\images\harihara.jpg" alt="Song 1" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="static\music\hari hara.mp3" class="text-blue-400 hover:underline">Hari Hara Veeramallu</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="static\images\retro.jpg" alt="Song 2" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="static\music\retro.mp3" class="text-blue-400 hover:underline">Retro</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="https://camo.githubusercontent.com/4e9e5aacbf5a6763bf73c029324159aeff389feac86aaa01acee495297bf8ece/68747470733a2f2f626c6f676765722e676f6f676c6575736572636f6e74656e742e636f6d2f696d672f622f523239765a32786c2f4156765873456a5f4e413749437533777a644d5f4a563647766c55324b5f565a5958645169393867774e486d513033546870674c6f774756614a535659524a6f33714732466e77394e756c646154635f544b7757754c6d6e7549593157726a366b7355426c5158344b577464334a503254747a464952794d50725955787965797547306c6576597959645f39396a6c45666e475f315969553671456e74313550725a4267365f4954656c6a657330565665564b5268357a78566b32354b6d4f69347a596d2f733332302f6a79756a79752e6a7067" alt="Song 0" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="https://open.spotify.com/track/1E4eyxteUpXpwThyARHrVJ?si=b4efec20391e43fe" class="text-blue-400 hover:underline">Chhaava</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="static\images\Kingston.jpg" alt="Song 3" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="static\music\kingston.mp3" class="text-blue-400 hover:underline">Kingston</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+                <div class="flex items-center bg-gray-800/60 p-4 rounded-xl shadow-md transition-all duration-300 hover:scale-105 hover:shadow-pink-500/30 w-full max-w-md">
+                    <img src="static\images\harihara.jpg" alt="Song 4" class="w-14 h-14 rounded-lg object-cover">
+                    <div class="ml-4">
+                        <h3 class="text-lg font-semibold"><a href="static\music\hari hara1.mp3" class="text-blue-400 hover:underline">Hari Hara Veeramallu</a></h3>
+                        <p class="text-gray-400 text-sm">Just released!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

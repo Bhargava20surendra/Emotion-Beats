@@ -1,0 +1,175 @@
+{% extends "home.html" %}
+{% block content %}
+
+<style>
+    /* General Styling */
+    body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        background: url('static/images/images/bg3.jpg') no-repeat center center fixed;
+        background-size: cover;
+        color: white;
+        margin: 0;
+        padding: 0;
+    }
+
+    /* Playlist Container */
+    .playlist-container {
+        background: rgba(0, 0, 0, 0.7);
+        padding: 20px;
+        border-radius: 10px;
+        display: inline-block;
+        margin-top: 50px;
+    }
+
+    /* Playlist Styling */
+    .playlist {
+        list-style: none;
+        padding: 0;
+    }
+
+    .playlist li {
+        background: rgba(255, 255, 255, 0.8);
+        color: black;
+        margin: 10px auto;
+        padding: 12px;
+        width: 300px;
+        border-radius: 10px;
+        cursor: pointer;
+        font-size: 18px;
+        font-weight: bold;
+        transition: background 0.3s, transform 0.2s;
+    }
+
+    .playlist li:hover {
+        background: rgba(255, 255, 255, 1);
+        transform: scale(1.05);
+    }
+
+    /* Music Player Custom Styling */
+    .music-player {
+        background: rgba(0, 0, 0, 0.8);
+        padding: 15px;
+        border-radius: 20px;
+        width: 80%;
+        max-width: 400px;
+        margin: 20px auto;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    audio {
+        width: 100%;
+        outline: none;
+        border-radius: 10px;
+    }
+
+    /* Footer Styling */
+    footer {
+        position: fixed;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        text-align: center;
+        padding: 10px 0;
+        font-size: 14px;
+    }
+</style>
+
+<body>
+    <div class="playlist-container">
+        <h2>🎶 Arijit Singh Playlist 🎶</h2>
+
+        <ul class="playlist">
+            <li onclick="playPauseSong('static/songs/O Maahi Dunki 320 Kbps.mp3')">🎵 O Maahi Dunki</li>
+            <li onclick="playPauseSong('static/songs/Satranga Animal 320 Kbps.mp3')">🎵 Satranga Animal</li>
+            <li onclick="playPauseSong('static/songs/Ve Kamleya Rocky Aur Rani Kii Prem Kahaani 320 Kbps.mp3')">🎵 Ve Kamleya</li>
+        </ul>
+    </div>
+
+    <!-- Hidden Audio Element -->
+    <audio id="audioPlayer" style="display: none;"></audio>
+
+    <script>
+        let audioPlayer = document.getElementById('audioPlayer');
+        let currentSong = ""; // Track the current song
+        
+        function playPauseSong(songUrl) {
+            if (currentSong === songUrl) {
+                // If the same song is playing, toggle play/pause
+                if (audioPlayer.paused) {
+                    audioPlayer.play();
+                } else {
+                    audioPlayer.pause();
+                }
+            } else {
+                // If a new song is selected, update the source and play
+                currentSong = songUrl;
+                audioPlayer.src = songUrl;
+                audioPlayer.load(); // Ensure the new audio is loaded
+                audioPlayer.play();
+            }
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // ✅ FIX: Voice Search Button Event
+            document.getElementById("voiceSearchBtn").addEventListener("click", function() {
+                if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                    alert("Your browser doesn't support voice search. Try using Google Chrome!");
+                    return;
+                }
+    
+                let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                let recognition = new SpeechRecognition();
+                recognition.lang = "en-US";
+                recognition.start();
+    
+                recognition.onresult = function(event) {
+                    let voiceText = event.results[0][0].transcript;
+                    console.log("🔊 Recognized Speech:", voiceText); // Debugging log
+    
+                    voiceText = voiceText.toLowerCase().trim().replace(/\./g, "").replace(/\s+/g, " ");
+                    console.log("🔍 Normalized Text:", voiceText); // Debugging log
+                    
+                    searchSongs(voiceText);
+                };
+    
+                recognition.onerror = function(event) {
+                    console.error("❌ Speech recognition error:", event.error); // Debugging log
+                    alert(`Voice search failed: ${event.error}`);
+                };
+    
+                recognition.onend = function() {
+                    console.log("🎤 Voice search ended");
+                };
+            });
+    
+            function searchSongs(query) {
+                query = query.toLowerCase().trim().replace(/\./g, "").replace(/\s+/g, "").replace(/-/g, ""); // Normalize query
+    
+                let allSongs = document.querySelectorAll(".playlist li");
+                let found = false;
+    
+                allSongs.forEach(song => {
+                    let songName = song.innerText.toLowerCase().replace(/\s+/g, "").replace(/-/g, ""); // Normalize song name
+    
+                    console.log("Comparing:", query, "vs", songName); // Debugging log
+    
+                    if (songName.includes(query)) {
+                        song.click(); // Auto-click to play the song
+                        found = true;
+                    }
+                });
+    
+                if (!found) {
+                    alert(`Song "${query}" not found. Try again!`);
+                }
+            }
+        });
+    </script>
+</body>
+
+{% endblock %}

@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emotion Beats - Music Streaming</title>    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <link rel="stylesheet" href="static/style.css">
+    <style>
+        html, body {
+            background-color: black;
+            height: 100%;
+        }
+        
+        /* Slideshow Styles */
+        .slideshow-container {
+            position: relative;
+            max-width: 100%;
+            height: 270px;
+            overflow: hidden;
+        }
+
+        .slides {
+            display: flex;
+            width: 300%;
+            animation: slide 15s infinite step-start;
+        }
+
+        .slide {
+            flex: 0 0 100%;
+            transition: transform 5s step-start;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(0%); }
+            33% { transform: translateX(-100%); }
+            66% { transform: translateX(-200%); }
+            100% { transform: translateX(0%); }
+        }
+        
+    </style>
+    <style>
+    .cd-cover {
+        position: relative;
+        width: 8rem;
+        height: 8rem;
+        margin: 0 auto;
+    }
+
+    .cd-image {
+        border-radius: 50%;
+        transition: transform 0.5s ease-in-out;
+    }
+
+    .cd-cover.playing .cd-image {
+        animation: spin 2s linear infinite;
+    }
+
+    @keyframes spin {
+        from {
+            transform: rotate(0deg);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .play-button {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(0, 0, 0, 0.7);
+        border: none;
+        border-radius: 50%;
+        color: white;
+        font-size: 1.5rem;
+        width: 2.5rem;
+        height: 2.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .play-button:focus {
+        outline: none;
+    }
+
+    #userDropdown {
+        z-index: 2;
+    }
+</style>
+    <script>
+        function toggleDropdown() {
+            document.getElementById("userDropdown").classList.toggle("hidden");
+        }
+
+        function selectCategory(category) {
+            document.querySelectorAll(".category-button").forEach(button => {
+                button.classList.remove("bg-white", "text-black");
+                button.classList.add("bg-gray-700", "text-white");
+            });
+            document.getElementById(category).classList.add("bg-white", "text-black");
+        }
+    </script>
+    
+</head>
+<body class="bg-black text-white min-h-screen">
+
+    <!-- Wrapper -->
+    <div class="flex flex-col min-h-screen">
+
+        <!-- Top Bar -->
+        <div class="bg-gray-900 p-4 flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-pink-500 bg-black px-4 py-2 rounded"><i class="fa-solid fa-headset"></i> Emotion Beats</h1>
+            <div class="flex items-center space-x-4 relative">
+                <div class="flex items-center space-x-2 p-4">
+                    <input type="text" id="searchInput" placeholder="Open With Voice..." class="px-4 py-2 rounded-lg text-black bg-white">
+                    <button id="voiceSearchBtn" class="bg-pink-500 p-2 rounded-full text-white">
+                        <i class="fa-solid fa-microphone"></i> 
+                    </button>
+                </div>
+                <a href="{{ url_for('notifications') }}" class="relative">
+                    <button>
+                        🔔
+                        <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
+                    </button>
+                </a>
+
+                <!-- User Dropdown -->
+                <div class="relative">
+                    <button1 onclick="toggleDropdown()" class="w-10 h-10 bg-blue-500 text-white flex items-center justify-center rounded-full">
+                        <i class="fa-solid fa-user-circle text-xl"></i>
+                    </button1>
+                    <div id="userDropdown" class="hidden absolute right-0 mt-2 w-48 bg-gray-800 rounded-lg shadow-lg py-2">
+                    <a href="{{ url_for('edit_profile') }}"class="block px-4 py-2 text-white hover:bg-gray-700">Edit Profile</a>
+                    <a href="{{ url_for('change_password') }}"class="block px-4 py-2 text-white hover:bg-gray-700">Change Password</a>
+                    <a href="{{ url_for('settings') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Settings</a>
+                    <a href="{{ url_for('logout') }}" class="block px-4 py-2 text-white hover:bg-gray-700">Logout</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-grow">
+            <!-- Sidebar -->
+            <div class="w-64 bg-gray-900 p-4">
+                <div class="mb-6"><a href="{{url_for('home')}}" class="text-lg font-bold">Home</a></div>
+                <div class="mb-6"><a href="#" class="text-lg font-bold">Playlist</a></div>
+                <div class="mb-6"><a href="#" class="text-lg font-bold">Your Library</a></div>
+                <div class="mb-6"><a href="{{url_for('prediction')}}" class="text-lg font-bold text-blue-500 hover:underline">Detect Emotion</a></div>
+            </div>
+            {%block content%}
+            <!-- Main Content -->
+            <div class="flex-1 p-6">
+                <!-- Slideshow -->
+                <div class="slideshow-container">
+                    <div class="slides">
+                        <div class="slide"><img src="static/images/banner1.jpg" alt="Slide 1"></div>
+                        <div class="slide"><img src="static/images/banner2.jpg" alt="Slide 2"></div>
+                        <div class="slide"><img src="static/images/banner3.jpg" alt="Slide 3"></div>
+                    </div>
+                    
+                </div>
+
+                <!-- Categories -->
+                    <br><div class="flex justify-start space-x-4 mb-4">
+                    <button1 id="all" class="category-button px-4 py-2 rounded-full bg-gray-700 text-white" onclick="selectCategory('all')">All</button1>
+                    <button1 id="music" class="category-button px-4 py-2 rounded-full bg-gray-700 text-white" onclick="selectCategory('music')">Music</button1>
+                    <button1 id="podcasts" class="category-button px-4 py-2 rounded-full bg-gray-700 text-white" onclick="selectCategory('podcasts')">Podcasts</button1>
+                </div>
+                <h2 class="text-2xl font-bold mb-4">Popular Singers</h2>
+                <div class="singers">
+                    <img src="static/images/singer 1.jpg" onclick="location.href='/singer1'" alt="Singer 1">
+                    <img src="static/images/singer 2.jpg" onclick="location.href='/singer2'" alt="Singer 2">
+                    <img src="static/images/singer 3.jpg" onclick="location.href='/singer3'" alt="Singer 3">
+                    <img src="static/images/singer 4.jpg" onclick="location.href='/singer4'" alt="Singer 4">
+                    <img src="static/images/singer 5.jpg" onclick="location.href='/singer5'" alt="Singer 5">
+                    <img src="static/images/spb.jpeg" onclick="location.href='/singer6'" alt="Singer 6">
+                </div>
+
+                <br><h2 class="text-2xl font-bold mb-4">Popular Music</h2>
+<div class="grid grid-cols-5 gap-4">
+    <div class="p-4 rounded-lg text-white bg-cover bg-center h-48" style="background-image: url('static/images/images/court.jpg')">
+        <h3 class="text-lg font-semibold"></h3>
+        <audio id="audioPlayer1" src="static/songs/Premalo.mp3"></audio>
+        <button id="playPauseBtn1" class="mt-4 p-2 bg-black rounded-full text-white" onclick="togglePlay('audioPlayer1', this)">▶</button>
+    </div>
+    <div class="p-4 rounded-lg text-white bg-cover bg-center h-48" style="background-image: url('static/images/images/devara.jpg')">
+        <h3 class="text-lg font-semibold"></h3>
+        <audio id="audioPlayer2" src="static/songs/Chuttamalle.mp3"></audio>
+        <button id="playPauseBtn2" class="mt-4 p-2 bg-black rounded-full text-white" onclick="togglePlay('audioPlayer2', this)">▶</button>
+    </div>
+    <div class="p-4 rounded-lg text-white bg-cover bg-center h-48" style="background-image: url('static/images/images/daku.jpg')">
+        <h3 class="text-lg font-semibold"></h3>
+        <audio id="audioPlayer3" src="static/songs/The Rage of Daaku.mp3"></audio>
+        <button id="playPauseBtn3" class="mt-4 p-2 bg-black rounded-full text-white" onclick="togglePlay('audioPlayer3', this)">▶</button>
+    </div>
+    <div class="p-4 rounded-lg text-white bg-cover bg-center h-48" style="background-image: url('static/images/images/peelings.jpg')">
+        <h3 class="text-lg font-semibold"></h3>
+        <audio id="audioPlayer4" src="static/songs/Peelings.mp3.mp3"></audio>
+        <button id="playPauseBtn4" class="mt-4 p-2 bg-black rounded-full text-white" onclick="togglePlay('audioPlayer4', this)">▶</button>
+    </div>
+    <div class="p-4 rounded-lg text-white bg-cover bg-center h-48" style="background-image: url('static/images/images/kannappa.jpg')">
+        <h3 class="text-lg font-semibold"></h3>
+        <audio id="audioPlayer5" src="static/songs/Shiva Shiva Shankara.mp3"></audio>
+        <button id="playPauseBtn5" class="mt-4 p-2 bg-black rounded-full text-white" onclick="togglePlay('audioPlayer5', this)">▶</button>
+    </div>
+   
+</div>
+
+<script>
+    function togglePlay(audioId, button) {
+        let audio = document.getElementById(audioId);
+        let cdCover = button.closest('.cd-cover');
+        if (audio.paused) {
+            document.querySelectorAll("audio").forEach(a => a.pause());
+            document.querySelectorAll("button").forEach(b => b.textContent = "▶");
+            document.querySelectorAll(".cd-cover").forEach(cd => cd.classList.remove('playing'));
+            audio.play();
+            button.textContent = "⏸";
+            cdCover.classList.add('playing');
+        } else {
+            audio.pause();
+            button.textContent = "▶";
+            cdCover.classList.remove('playing');
+        }
+    }
+
+    voiceSearchBtn.addEventListener('click', () => {
+        voiceSearchBtn.classList.add('bg-red-500'); // Change color while listening
+        
+        // ... existing code ...
+    
+        recognition.onend = () => {
+            voiceSearchBtn.classList.remove('bg-red-500'); // Reset color
+            voiceSearchBtn.classList.add('bg-pink-500');
+        };
+    });
+</script>
+
+                <br><h2 class="text-2xl font-bold mb-4">Popular Tamil Music</h2>
+<div class="grid grid-cols-5 gap-4">
+    <div class="p-4 rounded-lg bg-purple-500 text-center">
+        <img src="static/images/images/golden.jpg" alt="Khushi TDT" class="w-full h-32 object-cover rounded-lg">
+        <h3 class="text-lg font-semibold mt-2">Golden Sparrow</h3>
+        <button class="mt-2 p-2 bg-black rounded-full text-white" onclick="togglePlay('audio1', this)">▶</button>
+        <audio id="audio1" src="static/songs/[iSongs.info] 01 - Golden Sparrow.mp3"></audio>
+    </div>
+    <div class="p-4 rounded-lg bg-yellow-500 text-center">
+        <img src="static/images/images/dragon.jpg" alt="Arijit Singh" class="w-full h-32 object-cover rounded-lg">
+        <h3 class="text-lg font-semibold mt-2">Yendhukae</h3>
+        <button class="mt-2 p-2 bg-black rounded-full text-white" onclick="togglePlay('audio2', this)">▶</button>
+        <audio id="audio2" src="static/songs/[iSongs.info] 03 - Yendhukae Nannodhilaavu.mp3"></audio>
+    </div>
+    <div class="p-4 rounded-lg bg-red-500 text-center">
+        <img src="static/images/images/asha.jpg" alt="Alka Yagnik" class="w-full h-32 object-cover rounded-lg">
+        <h3 class="text-lg font-semibold mt-2">Aasa Kooda</h3>
+        <button class="mt-2 p-2 bg-black rounded-full text-white" onclick="togglePlay('audio3', this)">▶</button>
+        <audio id="audio3" src="static/songs/Aasa Kooda Sai Abhyankkar 320 Kbps.mp3"></audio>
+    </div>
+    <div class="p-4 rounded-lg bg-teal-500 text-center">
+        <img src="static/images/images/katchi.jpg" alt="Diljit Dosanjh" class="w-full h-32 object-cover rounded-lg">
+        <h3 class="text-lg font-semibold mt-2">Katchi Sera </h3>
+        <button class="mt-2 p-2 bg-black rounded-full text-white" onclick="togglePlay('audio4', this)">▶</button>
+        <audio id="audio4" src="static/songs/Katchi Sera Sai Abhyankkar 320 Kbps.mp3"></audio>
+    </div>
+    <div class="p-4 rounded-lg bg-indigo-500 text-center">
+        <img src="static/images/images/mana.jpg" alt="G. V. Prakash" class="w-full h-32 object-cover rounded-lg">
+        <h3 class="text-lg font-semibold mt-2">Manasilaayo</h3>
+        <button class="mt-2 p-2 bg-black rounded-full text-white" onclick="togglePlay('audio5', this)">▶</button>
+        <audio id="audio5" src="static/songs/Manasilaayo Vettaiyan 320 Kbps.mp3"></audio>
+    </div>
+</div>
+
+<script>
+    function togglePlay(audioId, button) {
+        let audio = document.getElementById(audioId);
+        let cdCover = button.closest('.cd-cover');
+        if (audio.paused) {
+            document.querySelectorAll("audio").forEach(a => a.pause());
+            document.querySelectorAll("button").forEach(b => b.textContent = "▶");
+            document.querySelectorAll(".cd-cover").forEach(cd => cd.classList.remove('playing'));
+            audio.play();
+            button.textContent = "⏸";
+            cdCover.classList.add('playing');
+        } else {
+            audio.pause();
+            button.textContent = "▶";
+            cdCover.classList.remove('playing');
+        }
+    }
+</script>
+
+               <br><br> <h2 class="text-2xl font-bold mb-4">Devotional Songs</h2>
+                <div class="grid grid-cols-5 gap-4">
+                    <div class="p-4 text-center">
+                        <div class="cd-cover">
+                            <img src="static/images/images/veyi.jpg" alt="Khushi TDT" class="w-full h-32 object-cover rounded-full cd-image">
+                            <button class="play-button" onclick="togglePlay('audio6', this)">▶</button>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-2"></h3>
+                        <audio id="audio6" src="static/songs/1-Veyyi Vemulavada-SenSongsMp3.Co.mp3"></audio>
+                    </div>
+                    <div class="p-4 text-center">
+                        <div class="cd-cover">
+                            <img src="static/images/images/seenu.jpg" alt="Arijit Singh" class="w-full h-32 object-cover rounded-full cd-image">
+                            <button class="play-button" onclick="togglePlay('audio7', this)">▶</button>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-2"></h3>
+                        <audio id="audio7" src="static/songs/Kodandaramudu (PenduJatt.Com.Se).mp3"></audio>
+                    </div>
+                    <div class="p-4 text-center">
+                        <div class="cd-cover">
+                            <img src="static/images/images/jee.jpg" alt="Alka Yagnik" class="w-full h-32 object-cover rounded-full cd-image">
+                            <button class="play-button" onclick="togglePlay('audio8', this)">▶</button>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-2"></h3>
+                        <audio id="audio8" src="static/songs/Jeevamu Neeve Kadaa (PenduJatt.Com.Se).mp3"></audio>
+                    </div>
+                    <div class="p-4 text-center">
+                        <div class="cd-cover">
+                            <img src="static/images/images/sri.jpg" alt="Diljit Dosanjh" class="w-full h-32 object-cover rounded-full cd-image">
+                            <button class="play-button" onclick="togglePlay('audio9', this)">▶</button>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-2"></h3>
+                        <audio id="audio9" src="static/songs/[iSongs.info] 04 - Antha Ramamayam.mp3"></audio>
+                    </div>
+                    <div class="p-4 text-center">
+                        <div class="cd-cover">
+                            <img src="static/images/images/sri.jpg" alt="G. V. Prakash" class="w-full h-32 object-cover rounded-full cd-image">
+                            <button class="play-button" onclick="togglePlay('audio10', this)">▶</button>
+                        </div>
+                        <h3 class="text-lg font-semibold mt-2"></h3>
+                        <audio id="audio10" src="static/songs/[iSongs.info] 12 - Entho Ruchira.mp3"></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+       
+      <!-- Footer (Pushes to bottom) -->
+    <footer class="bg-black text-gray-400 p-8 text-center mt-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm max-w-4xl mx-auto">
+        <div>
+            <h3 class="text-white font-bold">Company</h3>
+            <p>About</p>
+            <p>Jobs</p>
+            <p>For the Record</p>
+        </div>
+        <div>
+            <h3 class="text-white font-bold">Communities</h3>
+            <p>For Artists</p>
+            <p>Developers</p>
+            <p>Advertising</p>
+            <p>Investors</p>
+            <p>Vendors</p>
+        </div>
+        <div>
+            <h3 class="text-white font-bold">Useful links</h3>
+            <p>Support</p>
+            <p>Free Mobile App</p>
+        </div>
+        <div>
+            <h3 class="text-white font-bold">Emotion Beats Plans</h3>
+            <p>Premium Individual</p>
+            <p>Premium Duo</p>
+            <p>Premium Family</p>
+            <p>Premium Student</p>
+            <p>Emotion Beats Free</p>
+        </div>
+    </div>
+    
+    <!-- Social Media Links -->
+    <div class="mt-4 text-sm">
+        <div class="flex justify-center gap-4">
+            <!-- Facebook Icon -->
+            <a href="https://www.facebook.com" target="_blank" class="text-gray-400 hover:text-white">
+                <i class="fab fa-facebook-diljit.mp3f"></i>
+            </a>
+            <!-- Twitter Icon -->
+            <a href="https://www.twitter.com" target="_blank" class="text-gray-400 hover:text-white">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <!-- Instagram Icon -->
+            <a href="https://www.instagram.com" target="_blank" class="text-gray-400 hover:text-white">
+                <i class="fab fa-instagram"></i>
+            </a>
+            <!-- LinkedIn Icon -->
+            <a href="https://www.linkedin.com" target="_blank" class="text-gray-400 hover:text-white">
+                <i class="fab fa-linkedin-in"></i>
+            </a>
+        </div>
+    </div>
+   
+    <div class="mt-4 text-sm">
+        <p>© 2025 Emotion Beats AB</p>
+    </div>
+</footer>
+{%endblock%}
+    </div>
+<!-- ✅ JavaScript to Handle Dropdown Click Outside -->
+<script>
+    function toggleDropdown() {
+        document.getElementById("userDropdown").classList.toggle("hidden");
+    }
+    document.addEventListener("click", function(event) {
+        var dropdown = document.getElementById("userDropdown");
+        if (!event.target.closest(".relative")) {
+            dropdown.classList.add("hidden");
+        }
+    });
+</script>
+    
+    <script>
+        // Dropdown functionality
+        function toggleDropdown() {
+            document.getElementById("userDropdown").classList.toggle("hidden");
+        }
+
+        function selectCategory(category) {
+            document.querySelectorAll(".category-button").forEach(button => {
+                button.classList.remove("bg-white", "text-black");
+                button.classList.add("bg-gray-700", "text-white");
+            });
+            document.getElementById(category).classList.add("bg-white", "text-black");
+        }
+
+       // Voice recognition setup
+       document.addEventListener('DOMContentLoaded', () => {
+        const voiceSearchBtn = document.getElementById('voiceSearchBtn');
+        const searchInput = document.getElementById('searchInput');
+
+        voiceSearchBtn.addEventListener('click', () => {
+            voiceSearchBtn.classList.add('bg-green-500'); // Visual feedback
+            const synth = window.speechSynthesis;
+            const utterance = new SpeechSynthesisUtterance('Ensure your face is well-lit to Detect Your Emotion,then say open camera');
+            synth.speak(utterance);
+
+            setTimeout(() => {
+                if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                    alert("Your browser doesn't support voice input. Try using Google Chrome!");
+                    voiceSearchBtn.classList.remove('bg-green-500');
+                    voiceSearchBtn.classList.add('bg-pink-500');
+                    return;
+                }
+
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+
+                recognition.start();
+
+                recognition.onresult = (event) => {
+                    let emotion = event.results[0][0].transcript.toLowerCase().trim();
+                    console.log("Recognized emotion:", emotion);
+
+                    // List of valid emotions
+                    const validEmotions = ['open camera'];
+
+                    // Check if the spoken emotion is valid
+                    if (validEmotions.includes(emotion)) {
+                        searchInput.value = emotion;
+                        console.log("Opening page:", `http://127.0.0.1:5000/open_cam`);
+                        window.location.href = `http://127.0.0.1:5000/open_cam`; // Redirect to camera page
+                    } else {
+                        console.log("Emotion not recognized:", emotion);
+                        const errorMsg = new SpeechSynthesisUtterance(
+                            'Sorry, I didn\'t recognize that emotion. Please try again.'
+                        );
+                        synth.speak(errorMsg);
+                        alert('Emotion not recognized. Available emotions: ' + validEmotions.join(', '));
+                    }
+                };
+
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    const errorMsg = new SpeechSynthesisUtterance(
+                        'Sorry, there was an error with voice recognition. Please try again.'
+                    );
+                    synth.speak(errorMsg);
+                    alert(`Voice input failed: ${event.error}`);
+                };
+
+                recognition.onend = () => {
+                    voiceSearchBtn.classList.remove('bg-red-500');
+                    voiceSearchBtn.classList.add('bg-pink-500');
+                    console.log('Speech recognition ended');
+                };
+            }, 1500); // Delay for initial message
+        });
+    });
+
+        // Audio toggle function
+        function togglePlay(audioId, button) {
+            let audio = document.getElementById(audioId);
+            let cdCover = button.closest('.cd-cover');
+            if (audio.paused) {
+                document.querySelectorAll("audio").forEach(a => a.pause());
+                document.querySelectorAll("button").forEach(b => b.textContent = "▶");
+                document.querySelectorAll(".cd-cover").forEach(cd => cd.classList.remove('playing'));
+                audio.play();
+                button.textContent = "⏸";
+                if (cdCover) cdCover.classList.add('playing');
+            } else {
+                audio.pause();
+                button.textContent = "▶";
+                if (cdCover) cdCover.classList.remove('playing');
+            }
+        }
+        /*
+       document.addEventListener('DOMContentLoaded', () => {
+    const synth = window.speechSynthesis;
+
+    // Function to select a female voice and speak
+    const speakWelcomeMessage = () => {
+        const welcomeMessage = new SpeechSynthesisUtterance('Welcome to Emotion Beats');
+        welcomeMessage.lang = 'en-US';
+        welcomeMessage.volume = 1.0; // Full volume
+        welcomeMessage.rate = 1.0;   // Normal speed
+        welcomeMessage.pitch = 1.3;  // Slightly higher pitch for a "sweet" tone
+
+        // Get all available voices
+        let voices = synth.getVoices();
+
+        // Filter to get a female voice
+        let femaleVoices = voices.filter(voice => 
+            voice.name.includes('Female') || 
+            voice.name.includes('Samantha') || 
+            voice.name.includes('Victoria') || 
+            voice.name.includes('Google UK Female') ||
+            voice.name.toLowerCase().includes('female')
+        );
+
+        // Choose the first available female voice
+        if (femaleVoices.length > 0) {
+            welcomeMessage.voice = femaleVoices[0];
+        } else if (voices.length > 0) {
+            // Fallback: Choose any English voice if no female voice is found
+            welcomeMessage.voice = voices.find(voice => voice.lang === 'en-US') || voices[0];
+        }
+
+        synth.speak(welcomeMessage);
+    };
+
+    // Ensure voices are loaded properly
+    if (synth.getVoices().length > 0) {
+        speakWelcomeMessage();
+    } else {
+        synth.onvoiceschanged = () => {
+            speakWelcomeMessage();
+        };
+
+        // Fallback for delayed voice loading
+        setTimeout(() => {
+            if (!synth.speaking) speakWelcomeMessage();
+        }, 400);
+    }
+});*/
+
+    </script>
+</body>
+</html>
